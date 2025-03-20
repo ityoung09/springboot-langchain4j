@@ -34,6 +34,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
+import java.time.LocalDate;
+
 /**
  * @author <a href="mailto:chenxilzx1@gmail.com">theonefx</a>
  */
@@ -152,7 +154,7 @@ public class BasicController {
 
     @GetMapping(value = "/qwq32bUniqPreHistoryyWithFuncCall", produces = "text/stream;charset=utf-8")
     public Flux<String> qwq32bUniqPreHistoryyWithFuncCall(@RequestParam(value = "message", defaultValue = "你好", required = false) String message, @RequestParam("chatId") String chatId) {
-        TokenStream tokenStream = assistant4.chatStream(chatId, message);
+        TokenStream tokenStream = assistant4.chatStream(chatId, message, LocalDate.now().toString());
         return Flux.create(fluxSink -> {
             tokenStream.onPartialResponse(fluxSink::next)
                     .onCompleteResponse(chatResponse -> fluxSink.complete())

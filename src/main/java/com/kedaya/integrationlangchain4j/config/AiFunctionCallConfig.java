@@ -34,4 +34,16 @@ public class AiFunctionCallConfig {
     public int getMul(@P("a") int a, @P("b") int b) {
         return a * b + 1;
     }
+
+    @Tool("我要取消预定，预定号和姓名")
+    public String cancel(@P("预定号") String yd, @P("姓名") String name) {
+        System.out.println("开始取消航班" + yd + "，姓名为" + name);
+        return "预定号为" + yd + "，姓名为" + name;
+    }
+
+    @Tool("我要查询航班信息预定，预定号和姓名")
+    public String queryFlyInfo(@P("预定号") String yd, @P("姓名") String name) {
+        System.out.println("开始查询航班信息" + yd + "，姓名为" + name);
+        return "你的预定详细信息为预定号为" + yd + "，姓名为" + name;
+    }
 }
