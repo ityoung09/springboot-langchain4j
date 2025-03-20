@@ -17,6 +17,8 @@
 package com.kedaya.integrationlangchain4j.demos.web;
 
 import com.kedaya.integrationlangchain4j.config.AiChatStoreConfig;
+import com.kedaya.integrationlangchain4j.config.AiGroupByChatIdPersistentStoreConfig;
+import com.kedaya.integrationlangchain4j.config.AiGroupByChatIdPersistentStoreWithFuncCallConfig;
 import com.kedaya.integrationlangchain4j.config.AiGroupByChatIdStoreConfig;
 import dev.langchain4j.community.model.dashscope.QwenChatModel;
 import dev.langchain4j.community.model.dashscope.QwenStreamingChatModel;
@@ -58,7 +60,11 @@ public class BasicController {
 
     @Resource
     @Qualifier("groupByChatIdPersistentAssistant")
-    private AiGroupByChatIdStoreConfig.Assistant assistant3;
+    private AiGroupByChatIdPersistentStoreConfig.Assistant assistant3;
+
+    @Resource
+    @Qualifier("groupByChatIdPersistentWithFuncCallAssistant")
+    private AiGroupByChatIdPersistentStoreWithFuncCallConfig.Assistant assistant4;
 
 
     @GetMapping("/chat")
@@ -139,4 +145,21 @@ public class BasicController {
                     .start();
         });
     }
+    @GetMapping("/qwMaxUniqPreHistoryWithFuncCall")
+    public String qwMaxUniqPreHistoryWithFuncCall(@RequestParam(value = "message", defaultValue = "你好", required = false) String message, @RequestParam("chatId") String chatId) {
+        return assistant4.chat(chatId, message);
+    }
+
+    @GetMapping(value = "/qwq32bUniqPreHistoryyWithFuncCall", produces = "text/stream;charset=utf-8")
+    public Flux<String> qwq32bUniqPreHistoryyWithFuncCall(@RequestParam(value = "message", defaultValue = "你好", required = false) String message, @RequestParam("chatId") String chatId) {
+        TokenStream tokenStream = assistant4.chatStream(chatId, message);
+        return Flux.create(fluxSink -> {
+            tokenStream.onPartialResponse(fluxSink::next)
+                    .onCompleteResponse(chatResponse -> fluxSink.complete())
+                    .onError(fluxSink::error)
+                    .start();
+        });
+    }
+
+
 }

@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Configuration;
  * 会话分离，历史会话持久储配置
  */
 @Configuration
-public class AiGroupByChatIdPersistentStoreConfig {
+public class AiGroupByChatIdPersistentStoreWithFuncCallConfig {
 
     public interface Assistant {
         String chat(@MemoryId String chatId, @UserMessage String message);
@@ -31,15 +31,19 @@ public class AiGroupByChatIdPersistentStoreConfig {
     }
 
     @Bean
-    public AiGroupByChatIdPersistentStoreConfig.Assistant groupByChatIdPersistentAssistant(@Qualifier("qwenChatModel") ChatLanguageModel qwenChatModel, QwenStreamingChatModel qwenStreamingChatModel) {
+    public AiGroupByChatIdPersistentStoreWithFuncCallConfig.Assistant groupByChatIdPersistentWithFuncCallAssistant(@Qualifier("qwenChatModel") ChatLanguageModel qwenChatModel,
+                                                                                 QwenStreamingChatModel qwenStreamingChatModel,
+                                                                                 AiFunctionCallConfig aiFunctionCallConfig) {
 
         ChatMemoryProvider chatMemoryProvider = memoryId -> MessageWindowChatMemory.builder()
                 .id(memoryId)
                 .maxMessages(10)
                 .chatMemoryStore(new MySqlChatMemoryStoreConfig())
                 .build();
-        return AiServices.builder(AiGroupByChatIdPersistentStoreConfig.Assistant.class).chatLanguageModel(qwenChatModel)
+        return AiServices.builder(AiGroupByChatIdPersistentStoreWithFuncCallConfig.Assistant.class).chatLanguageModel(qwenChatModel)
                 .streamingChatLanguageModel(qwenStreamingChatModel)
-                .chatMemoryProvider(chatMemoryProvider).build();
+                .chatMemoryProvider(chatMemoryProvider)
+                .tools(aiFunctionCallConfig)
+                .build();
     }
 }
